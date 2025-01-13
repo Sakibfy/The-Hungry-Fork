@@ -4,10 +4,11 @@ import { useForm } from "react-hook-form";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../provider/AuthProvider";
 import Swal from "sweetalert2";
-
+import useAxiosPublic from "../../hooks/useAxiosPublic";
+import SocialLogin from '../../component/SocialLogin';
 
 const SingUp = () => {
-
+    const axiosPublic = useAxiosPublic();
     const { register, handleSubmit, reset, formState: { errors }, } = useForm();
     const { createUser, updateUserProfile } = useContext(AuthContext);
 
@@ -21,17 +22,28 @@ const SingUp = () => {
                 console.log(loggedUser);
                 updateUserProfile(data.name, data.photoURL) 
                     .then(() => {
-                        console.log('user profile info updated');
-                        reset()
-                        Swal.fire({
+                        // create user entry in the database
+                      
+                        const userinfo = {
+                            name: data.name,
+                            email: data.email,
+                        }
+                        axiosPublic.post('/users', userinfo)
+                         .then(res => {
+                             if (res.data.insertedId) {
+                            console.log('user added to the database');     
+                           reset()
+                           Swal.fire({
                            position: "top-end",
                            icon: "success",
                            title: "User create successfully",
                            showConfirmButton: false,
                            timer: 1500
-                        });
-                        
-                        navigate('/')
+                           });
+                           navigate('/');
+                           }
+                           })
+                       
                     })
                 .catch(error=> console.log(error))
         })
@@ -95,7 +107,8 @@ return (
      </div>
  </form>
     <p className="text-center font-semibold text-xl mb-3"><small >Already have an account <Link to="/login">-Login</Link></small></p>
-   </dv>
+  <SocialLogin></SocialLogin>
+ </dv>
    </div>
     </div>
 </>

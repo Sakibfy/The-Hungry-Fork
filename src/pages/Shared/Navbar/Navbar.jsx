@@ -1,14 +1,15 @@
 import { useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { AuthContext } from "../../../provider/AuthProvider";
-import { BsCart4 } from "react-icons/bs";
-import useCart from "../../../hooks/useCart";
+import useAdmin from "../../../hooks/useAdmin";
+// import { BsCart4 } from "react-icons/bs";
+// import useCart from "../../../hooks/useCart";
 
 
 const Navbar = () => {
   const { user, logOut } = useContext(AuthContext)
-  const [cart] = useCart()
-  console.log(cart);
+  // const [cart] = useCart()
+  const [isAdmin] = useAdmin();
     const handleLogOut = () => {
         logOut()
          .then(() => { })
@@ -18,17 +19,28 @@ const Navbar = () => {
   const navOptions = <>
        <NavLink to={'/'}><li>HOME</li></NavLink>
        <NavLink to={'/fd'}><li>CONTACT US</li></NavLink>
-       <NavLink to={'dfd/'}>DASHBOARD</NavLink>
+       {/* <NavLink to={'/dashboard/cart'}>DASHBOARD</NavLink> */}
        <NavLink to={'/menu'}>OUR MENU</NavLink>
        <NavLink to={'/order/salad'}> <li>Order Food</li></NavLink>
-    <NavLink to={'/secret'}> <li>Secret</li></NavLink>
+       
     
-      <Link to={'/dashboard/cart'}>
+    {
+      user && isAdmin && <NavLink to={'/dashboard/AdminHome'}> <li>Dashboard</li></NavLink> 
+    }
+    {
+      user && !isAdmin && <NavLink to={'/dashboard/userHome'}> <li>Dashboard</li></NavLink> 
+    }
+
+
+
+
+
+      {/* <Link to={'/dashboard/cart'}>
       <button className="btn btn-ghost">
      <BsCart4 className="text-2xl  rounded-full "></BsCart4>
         <div className="badge badge-secondary">+{ cart.length}</div>
           </button>
-      </Link>
+      </Link> */}
     
     </>
   return (
@@ -69,11 +81,13 @@ const Navbar = () => {
       </div>
       <ul
         tabIndex={0}
-        className="menu menu-sm dropdown-content bg-slate-600 rounded-box z-[1] md:mt-32 mt-28 w-52 p-2 shadow">
+        className="menu menu-sm dropdown-content bg-slate-300 rounded-box z-[1] md:mt-48 mt-36 w-52 p-2 shadow">
                {
             user ? <>
+                <Link to={'/dashboard/cart'}><button  className="btn btn-ghost text-yellow-800 border border-red-100 my-3">Dashboard</button></Link>
+                  
+               <Link> <button onClick={handleLogOut} className="btn btn-ghost text-red-500 border border-red-100">LogOut</button></Link>
                 
-                <button onClick={handleLogOut} className="btn btn-ghost text-red-500 border border-red-100">LogOut</button>
             </> : <>
                 <li className="list-none bg-yellow-400 p-1 rounded-2xl"><Link to="/login">Login</Link></li>
             </>
